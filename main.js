@@ -11,6 +11,7 @@ const MOUTH_OPEN_MIN_MS = 70;
 const MOUTH_OPEN_MAX_MS = 140;
 const MOUTH_CLOSED_MIN_MS = 90;
 const MOUTH_CLOSED_MAX_MS = 220;
+const RETRY_LOCK_MS = 1000;
 
 const ASSETS = {
   image: {
@@ -98,6 +99,7 @@ phina.define("MainScene", {
     this.mouthOpen = false;
     this.mouthTalkEndMs = 0;
     this.nextMouthChangeMs = 0;
+    this.retryUnlockTime = 0;
 
     // 上部の学習表示領域。
     // 背景を先に作り、その後にvisualLayerを作る。
@@ -216,6 +218,12 @@ phina.define("MainScene", {
   },
 
   handleMainButton: function(capturedMode) {
+
+    // GAME OVER直後の連打による誤RETRYを防ぐ
+    if (this.gameOver && performance.now() < this.retryUnlockTime) {
+      return;
+    }
+
     const mode = capturedMode || (this.playing && !this.gameOver ? "push" : (this.gameOver ? "retry" : "start"));
 
     if (mode === "push") {
@@ -231,6 +239,8 @@ phina.define("MainScene", {
 
   startGame: function() {
     if (this.playing) return;
+
+    // SoundManager.play("scratch1");
 
     SoundManager.stopMusic();
     this.clearVisuals();
@@ -486,6 +496,10 @@ phina.define("MainScene", {
     this.playing = false;
     this.gameOver = true;
     this.paused = false;
+
+    // 1秒間RETRY禁止
+    this.retryUnlockTime = performance.now() + RETRY_LOCK_MS;
+
     // this.pauseButton.text = "PAUSE";
     this.pauseTimeLabel.text = "";
     this.stopMouthTalk();
