@@ -185,7 +185,7 @@ phina.define("MainScene", {
     }.bind(this);
 
     this.messageLabel = Label({
-      text: "STARTを押してください",
+      text: "※音ありでお楽しみください",
       fontSize: 25,
       fontWeight: "bold",
       fill: "#000",
@@ -247,7 +247,7 @@ phina.define("MainScene", {
     this.startTime = performance.now();
     this.nextVisualIndex = 0;
     this.nextNoteIndex = 0;
-    this.messageLabel.text = "ラップを聴いてリズムを刻もう";
+    this.messageLabel.text = "タイミングよくボタンを押そう";
     this.hitButton.text = "PUSH";
     this.hitButton.alpha = 1;
     this.mainButtonPressMode = "push";
@@ -477,7 +477,7 @@ phina.define("MainScene", {
     // SoundManager側では自然終了済みなので、ここではstopMusic()しない。
     this.clearNotes();
     this.messageLabel.text = "クリア！";
-    this.hitButton.text = "REPLAY";
+    this.hitButton.text = "RETRY";
     this.hitButton.alpha = 1;
     this.mainButtonPressMode = "start";
   },
