@@ -81,6 +81,19 @@ const NOTE_TIMES = [
   15.1, 17.0, 20, 21.8, 24.1, 24.4, 24.7, 25.1, 25.5
 ];
 
+phina.define("TitleScene", {
+  superClass: "DisplayScene",
+  init: function() {
+    this.superInit({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, backgroundColor: "#fff" });
+    Label({ text: "死活ラップ", fontSize: 64, fontWeight: "bold", fill: "#000" })
+      .addChildTo(this).setPosition(SCREEN_WIDTH / 2, 180);
+    Sprite("face1").addChildTo(this).setPosition(SCREEN_WIDTH / 2, 440).setSize(320, 320);
+    Label({ text: "※音ありでプレイしてください", fontSize: 27, fontWeight: "bold", fill: "#333" })
+      .addChildTo(this).setPosition(SCREEN_WIDTH / 2, 640);
+    this.onpointstart = function() { this.exit(); }.bind(this);
+  },
+});
+
 phina.define("MainScene", {
   superClass: "DisplayScene",
 
@@ -145,24 +158,29 @@ phina.define("MainScene", {
     RectangleShape({
       width: 300,
       height: 120,
-      fill: "#262a30",
-      stroke: "#60656d",
+      // fill: "#262a30",
+      // stroke: "#60656d",
+      fill: "#fff",
+      stroke: "#000",
       strokeWidth: 3,
       cornerRadius: 18,
     }).addChildTo(this).setPosition(335, 700);
 
     this.judgeCircle = CircleShape({
       radius: 34,
-      fill: "#353a42",
-      stroke: "#f4d35e",
-      strokeWidth: 6,
+      // fill: "#353a42",
+      // stroke: "#f4d35e",
+      fill: "#fff",
+      stroke: "#000",
+      strokeWidth: 3,
     }).addChildTo(this).setPosition(JUDGE_X, 700);
 
     Label({
       text: "HIT",
       fontSize: 18,
       fontWeight: "bold",
-      fill: "#f4d35e",
+      // fill: "#f4d35e",
+      fill: "#000",
     }).addChildTo(this).setPosition(JUDGE_X, 700);
 
     // 下部右: 唯一の入力ボタン。
@@ -171,10 +189,12 @@ phina.define("MainScene", {
       width: 140,
       height: 140,
       fontSize: 31,
-      fill: "#c74636",
-      stroke: "#7e291f",
-      strokeWidth: 5,
-      fontColor: "white",
+      // fill: "#c74636",
+      // stroke: "#7e291f",
+      fill: "#fff",
+      stroke: "#000",
+      strokeWidth: 10,
+      fontColor: "black",
       cornerRadius: 70,
     }).addChildTo(this).setPosition(545, 700);
     // 押し始めた瞬間の役割を記録する。
@@ -194,7 +214,7 @@ phina.define("MainScene", {
     }.bind(this);
 
     this.messageLabel = Label({
-      text: "※音ありでお楽しみください",
+      text: "STARTボタンで始まります",
       fontSize: 25,
       fontWeight: "bold",
       fill: "#000",
@@ -554,10 +574,14 @@ phina.define("MainScene", {
 
 phina.main(function() {
   const app = GameApp({
-    startLabel: "main",
+    startLabel: "title",
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     assets: ASSETS,
+    scenes: [
+      { className: "TitleScene", label: "title", nextLabel: "main" },
+      { className: "MainScene", label: "main" },
+    ],
   });
 
   app.run();
