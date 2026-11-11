@@ -12,6 +12,12 @@ const MOUTH_OPEN_MAX_MS = 140;
 const MOUTH_CLOSED_MIN_MS = 90;
 const MOUTH_CLOSED_MAX_MS = 220;
 const RETRY_LOCK_MS = 1000;
+const BPM = 100;
+const BEAT_MS = 60000 / BPM;
+const FACE_BASE_Y = 700;
+const FACE_BOUNCE_Y = 8;
+const FACE_BOUNCE_UP_MS = 90;
+const FACE_BOUNCE_DOWN_MS = 150;
 
 const ASSETS = {
   image: {
@@ -100,6 +106,7 @@ phina.define("MainScene", {
     this.mouthTalkEndMs = 0;
     this.nextMouthChangeMs = 0;
     this.retryUnlockTime = 0;
+    this.lastFaceBeat = -1;
 
     // 上部の学習表示領域。
     // 背景を先に作り、その後にvisualLayerを作る。
@@ -257,11 +264,14 @@ phina.define("MainScene", {
     this.startTime = performance.now();
     this.nextVisualIndex = 0;
     this.nextNoteIndex = 0;
+    this.lastFaceBeat = -1;
     this.messageLabel.text = "タイミングよくボタンを押そう";
     this.hitButton.text = "PUSH";
     this.hitButton.alpha = 1;
     this.mainButtonPressMode = "push";
     this.stopMouthTalk();
+    this.faceClosed.y = FACE_BASE_Y;
+    this.faceOpen.y = FACE_BASE_Y;
 
     const music = SoundManager.playMusic("music", 0, false);
 
@@ -297,6 +307,7 @@ phina.define("MainScene", {
     const elapsedMs = performance.now() - this.startTime;
     const elapsedSec = elapsedMs / 1000;
 
+    this.updateFaceBeat(elapsedMs);
     this.updateMouth(elapsedMs);
     this.processVisualEvents(elapsedSec);
     this.createUpcomingNotes(elapsedMs);
@@ -423,6 +434,20 @@ phina.define("MainScene", {
     } else {
       this.endGame("タイミングミス！", nearest);
     }
+  },
+
+  updateFaceBeat: function(elapsedMs) {
+    const beat = Math.floor(elapsedMs / BEAT_MS);
+    if (beat === this.lastFaceBeat) return;
+    this.lastFaceBeat = beat;
+
+    // 口閉じ・口開きの2枚を同時に8pxだけ上下させる。
+    [this.faceClosed, this.faceOpen].forEach(function(face) {
+      face.y = FACE_BASE_Y;
+      face.tweener.clear()
+        .to({ y: FACE_BASE_Y - FACE_BOUNCE_Y }, FACE_BOUNCE_UP_MS, "easeOutQuad")
+        .to({ y: FACE_BASE_Y }, FACE_BOUNCE_DOWN_MS, "easeInQuad");
+    });
   },
 
   startMouthTalk: function(elapsedMs) {
